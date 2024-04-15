@@ -30,6 +30,7 @@ class ScreenScraperApiImpl(
     private val logger = newLogger(loggerFactory)
 
     override suspend fun getSystems(): List<System> {
+        logger.debug { "Get systems" }
         return withContext(Dispatchers.IO) {
             val response = httpClient
                 .get(BASE_URL) {
@@ -51,17 +52,23 @@ class ScreenScraperApiImpl(
                 val ssRsponse: SystemListResponse = response.body()
                 ssRsponse.response.systems
             } catch (e: Exception) {
-                logger.info { "Response: ${response.toString()}" }
-                logger.info { "Response: ${response.bodyAsText()}" }
+                val body = response.bodyAsText()
+                val status = response.status.value
+                logger.error { "Response status: $status" }
+                if (body == BAD_DEV_IDS_MSG) {
+                    throw BadDevIdsException(e)
+                }
+                logger.info { "Response body: \"$body\"" }
                 throw e
             }
         }
     }
 
     companion object {
-        const val BASE_URL = "https://www.screenscraper.fr/api2/"
-        const val GET_SYSTEMS_PATH = "systemesListe.php"
+        private const val BASE_URL = "https://www.screenscraper.fr/api2/"
+        private const val GET_SYSTEMS_PATH = "systemesListe.php"
+        private const val BAD_DEV_IDS_MSG = "\uFEFFErreur de login : Vérifier vos identifiants développeur !"
     }
 }
 
-class BadDevIdsException: Exception()
+class BadDevIdsException(e: Exception): Exception(e)

@@ -19,14 +19,15 @@ object ScreenScraper {
         this.devPassword = devPassword
         this.softName = softName
         registered = true
+        // ToDo should refresh impl
     }
 
     fun logIn(
-        userId: String,
-        userPassword: String,
+        userId: String?,
+        userPassword: String?,
     ) {
-        this.userId = userId
-        this.userPassword = userPassword
+        this.userId = userId?.takeIf { it.isNotBlank() }
+        this.userPassword = userPassword?.takeIf { it.isNotBlank() }
     }
 
     val api: ScreenScraperApi by lazy {
@@ -37,8 +38,8 @@ object ScreenScraper {
             devId = requireNotNull(devId),
             devPassword = requireNotNull(devPassword),
             softName =requireNotNull(softName),
-            userId = requireNotNull(userId),
-            userPassword = requireNotNull(userPassword),
+            userId = userId,
+            userPassword = userPassword,
         )
     }
 }

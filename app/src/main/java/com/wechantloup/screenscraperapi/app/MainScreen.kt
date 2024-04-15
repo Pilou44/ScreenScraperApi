@@ -34,28 +34,28 @@ fun MainScreen(
             label = { Text("Dev ID") },
         )
         TextField(
-            value = state.devId.orEmpty(),
+            value = state.devPassword.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewDevPasswordIntent(id)) }
             },
             label = { Text("Dev password") },
         )
         TextField(
-            value = state.devId.orEmpty(),
+            value = state.softName.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewAppNameIntent(id)) }
             },
             label = { Text("App name") },
         )
         TextField(
-            value = state.devId.orEmpty(),
+            value = state.userId.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewUserIdIntent(id)) }
             },
             label = { Text("User ID") },
         )
         TextField(
-            value = state.devId.orEmpty(),
+            value = state.userPassword.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewUserPasswordIntent(id)) }
             },
