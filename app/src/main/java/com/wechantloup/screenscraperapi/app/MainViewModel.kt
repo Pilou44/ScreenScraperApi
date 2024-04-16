@@ -7,12 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.wechantloup.screenscraperapi.lib.BadDevIdsException
 import com.wechantloup.screenscraperapi.lib.NotRegisteredException
 import com.wechantloup.screenscraperapi.lib.ScreenScraper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -27,10 +27,9 @@ class MainViewModel(
     private val stringStore = StringStore(application)
 
     init {
-        screenIntentChannel
-            .receiveAsFlow()
-            .onEach { handleIntent(it) }
-            .launchIn(viewModelScope)
+        viewModelScope.launch {
+            screenIntentChannel.consumeEach { handleIntent(it) }
+        }
 
         viewModelScope.launch {
             val appName = getAppName()
@@ -51,12 +50,23 @@ class MainViewModel(
 
     private fun handleIntent(intent: ScreenIntent) {
         when (intent) {
-            is GetPlatformsIntent -> viewModelScope.launch { getPlatforms() }
+            is GetPlatformsIntent -> viewModelScope.launchLoading { getPlatforms() }
             is NewAppNameIntent -> viewModelScope.launch { saveAppName(intent.name) }
             is NewDevIdIntent -> viewModelScope.launch { saveDevId(intent.id) }
             is NewDevPasswordIntent -> viewModelScope.launch { saveDevPassword(intent.pwd) }
             is NewUserIdIntent -> viewModelScope.launch { saveUserId(intent.id) }
             is NewUserPasswordIntent -> viewModelScope.launch { saveUserPassword(intent.pwd) }
+        }
+    }
+
+    private fun CoroutineScope.launchLoading(
+        block: suspend CoroutineScope.() -> Unit
+    ) {
+        if (_screenState.value.isLoading) return
+        _screenState.value = _screenState.value.copy(isLoading = true)
+        launch(Dispatchers.Default) {
+            block()
+            _screenState.value = _screenState.value.copy(isLoading = false)
         }
     }
 
@@ -161,6 +171,7 @@ class MainViewModel(
 }
 
 data class MainState(
+    val isLoading: Boolean = false,
     val devId: String? = null,
     val devPassword: String? = null,
     val softName: String? = null,
