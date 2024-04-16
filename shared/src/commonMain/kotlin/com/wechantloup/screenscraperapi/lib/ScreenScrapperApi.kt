@@ -32,6 +32,11 @@ internal class ScreenScraperApiImpl(
 
     override suspend fun getSystems(): List<System> {
         logger.debug { "Get systems" }
+        val ssResponse: SystemListResponse = launchRequest(GET_SYSTEMS_PATH)
+        return ssResponse.response.systems
+    }
+
+    private suspend inline fun <reified T> launchRequest(url: String): T {
         return withContext(Dispatchers.IO) {
             val response = httpClient
                 .get(BASE_URL) {
@@ -45,17 +50,16 @@ internal class ScreenScraperApiImpl(
                     }
 
                     url {
-                        appendPathSegments(GET_SYSTEMS_PATH)
+                        appendPathSegments(url)
                     }
                 }
             logger.info { "URL: ${response.request.url}" }
             try {
-                val ssRsponse: SystemListResponse = response.body()
-                ssRsponse.response.systems
+                response.body<T>()
             } catch (e: Exception) {
-                val body = response.bodyAsText()
                 val status = response.status.value
                 logger.error { "Response status: $status" }
+                val body = response.bodyAsText()
                 if (body == BAD_DEV_IDS_MSG) {
                     throw BadDevIdsException(e)
                 }
