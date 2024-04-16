@@ -1,5 +1,6 @@
 package com.wechantloup.screenscraperapi.lib
 
+import com.wechantloup.screenscraperapi.lib.ScreenScraper.httpClient
 import com.wechantloup.screenscraperapi.lib.model.System
 import com.wechantloup.screenscraperapi.lib.model.SystemListResponse
 import io.ktor.client.call.body
