@@ -1,6 +1,6 @@
 package com.wechantloup.screenscraperapi.lib
 
-object ScreenScraper {
+public object ScreenScraper {
 
     private var devId: String? = null
     private var devPassword: String? = null
@@ -10,7 +10,7 @@ object ScreenScraper {
 
     private var registered: Boolean = false
 
-    fun register(
+    public fun register(
         devId: String,
         devPassword: String,
         softName: String,
@@ -22,7 +22,7 @@ object ScreenScraper {
         // ToDo should refresh impl
     }
 
-    fun logIn(
+    public fun logIn(
         userId: String?,
         userPassword: String?,
     ) {
@@ -30,7 +30,7 @@ object ScreenScraper {
         this.userPassword = userPassword?.takeIf { it.isNotBlank() }
     }
 
-    val api: ScreenScraperApi by lazy {
+    public val api: ScreenScraperApi by lazy {
         if (!registered) {
             throw NotRegisteredException()
         }
@@ -43,5 +43,3 @@ object ScreenScraper {
         )
     }
 }
-
-class NotRegisteredException: Exception("Dev account should be registered")

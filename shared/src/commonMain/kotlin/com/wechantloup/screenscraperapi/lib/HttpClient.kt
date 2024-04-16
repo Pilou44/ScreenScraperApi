@@ -8,7 +8,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalSerializationApi::class)
-val httpClient = HttpClient {
+internal val httpClient = HttpClient {
     // ToDo add cookies management to store user ids https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client.plugins.cookies/-http-cookies/index.html
     install(HttpRequestRetry) {
         retryOnServerErrors(maxRetries = 2)

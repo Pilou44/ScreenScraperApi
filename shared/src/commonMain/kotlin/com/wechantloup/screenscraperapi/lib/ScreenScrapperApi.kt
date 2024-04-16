@@ -14,11 +14,11 @@ import org.kodein.log.LoggerFactory
 import org.kodein.log.frontend.defaultLogFrontend
 import org.kodein.log.newLogger
 
-interface ScreenScraperApi {
-    suspend fun getSystems(): List<System>
+public interface ScreenScraperApi {
+    public suspend fun getSystems(): List<System>
 }
 
-class ScreenScraperApiImpl(
+internal class ScreenScraperApiImpl(
     private val devId: String,
     private val devPassword: String,
     private val softName: String,
@@ -70,5 +70,3 @@ class ScreenScraperApiImpl(
         private const val BAD_DEV_IDS_MSG = "\uFEFFErreur de login : Vérifier vos identifiants développeur !"
     }
 }
-
-class BadDevIdsException(e: Exception): Exception(e)
