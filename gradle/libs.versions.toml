@@ -1,6 +1,7 @@
 [versions]
 agp = "8.3.0"
 androidx-activityCompose = "1.8.2"
+atomicfuGradlePlugin = "0.23.2"
 composeBom = "2024.03.00"
 compose-compiler = "1.5.11"
 coreKtx = "1.12.0"
@@ -15,6 +16,7 @@ lifecycleRuntimeKtx = "2.7.0"
 datastore = "1.0.0"
 
 [libraries]
+atomicfu-gradle-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfuGradlePlugin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

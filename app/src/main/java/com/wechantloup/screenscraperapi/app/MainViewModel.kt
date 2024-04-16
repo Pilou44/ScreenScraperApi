@@ -62,7 +62,7 @@ class MainViewModel(
 
     private suspend fun getPlatforms() {
         try {
-            val platforms = ScreenScraper.api.getSystems()
+            val platforms = ScreenScraper.getSystems()
             _screenState.value = screenState.value.copy(platformsState = "${platforms.size} platforms found")
         } catch (e: NotRegisteredException) {
             _screenState.value = screenState.value.copy(platformsState = "Not registered")
