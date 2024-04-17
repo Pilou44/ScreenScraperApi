@@ -1,9 +1,12 @@
 package com.wechantloup.screenscraperapi.lib
 
 import com.wechantloup.screenscraperapi.lib.ScreenScraper.httpClient
+import com.wechantloup.screenscraperapi.lib.model.GameInfo
+import com.wechantloup.screenscraperapi.lib.model.GameInfoResponse
 import com.wechantloup.screenscraperapi.lib.model.System
 import com.wechantloup.screenscraperapi.lib.model.SystemListResponse
 import io.ktor.client.call.body
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
@@ -17,6 +20,13 @@ import org.kodein.log.newLogger
 
 public interface ScreenScraperApi {
     public suspend fun getSystems(): List<System>
+    public suspend fun getGameInfo(
+        crcHexa: String,
+        systemId: Int,
+        romName: String,
+        romSize: Long,
+        romType: String = "rom",
+    ): GameInfo
 }
 
 internal class ScreenScraperApiImpl(
@@ -36,10 +46,32 @@ internal class ScreenScraperApiImpl(
         return ssResponse.response.systems
     }
 
-    private suspend inline fun <reified T> launchRequest(url: String): T {
+    override suspend fun getGameInfo(
+        crcHexa: String,
+        systemId: Int,
+        romName: String,
+        romSize: Long,
+        romType: String,
+    ): GameInfo {
+        logger.debug { "Get game" }
+        val ssResponse: GameInfoResponse = launchRequest(GET_GAME_INFO_PATH) {
+            url {
+                parameters.append("crc", crcHexa)
+                parameters.append("systemeid", systemId.toString())
+                parameters.append("romnom", romName)
+                parameters.append("romtaille", romSize.toString())
+                parameters.append("romtype", romType)
+            }
+        }
+        return ssResponse.response.gameInfo
+    }
+
+    private suspend inline fun <reified T> launchRequest(url: String, crossinline buildUrl: HttpRequestBuilder.() -> Unit = {}): T {
         return withContext(Dispatchers.IO) {
             val response = httpClient
                 .get(BASE_URL) {
+                    buildUrl()
+
                     url {
                         parameters.append("output", "json")
                         parameters.append("devid", devId)
@@ -59,19 +91,27 @@ internal class ScreenScraperApiImpl(
             } catch (e: Exception) {
                 val status = response.status.value
                 logger.error { "Response status: $status" }
-                val body = response.bodyAsText()
-                if (body == BAD_DEV_IDS_MSG) {
-                    throw BadDevIdsException(e)
-                }
-                logger.info { "Response body: \"$body\"" }
+                val message = response.bodyAsText()
+                logger.info { "Response body: \"$message\"" }
+                handleError(status, message, e)
                 throw e
             }
+        }
+    }
+
+    private fun handleError(status: Int, message: String, cause: Exception) {
+        if (status == 400 && message.contains(MISSING_PARAMS_MSG)) {
+            throw MissingUrlParameterException(cause)
+        } else if (message.contains(BAD_DEV_IDS_MSG)) {
+            throw BadDevIdsException(cause)
         }
     }
 
     companion object {
         private const val BASE_URL = "https://www.screenscraper.fr/api2/"
         private const val GET_SYSTEMS_PATH = "systemesListe.php"
-        private const val BAD_DEV_IDS_MSG = "\uFEFFErreur de login : Vérifier vos identifiants développeur !"
+        private const val GET_GAME_INFO_PATH = "jeuInfos.php"
+        private const val BAD_DEV_IDS_MSG = "Erreur de login : Verifier vos identifiants developpeur !"
+        private const val MISSING_PARAMS_MSG = "Il manque des champs obligatoires dans l'url"
     }
 }

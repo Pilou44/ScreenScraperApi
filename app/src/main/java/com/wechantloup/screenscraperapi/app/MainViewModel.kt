@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.wechantloup.screenscraperapi.lib.BadDevIdsException
+import com.wechantloup.screenscraperapi.lib.MissingUrlParameterException
 import com.wechantloup.screenscraperapi.lib.NotRegisteredException
 import com.wechantloup.screenscraperapi.lib.ScreenScraper
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +52,7 @@ class MainViewModel(
     private fun handleIntent(intent: ScreenIntent) {
         when (intent) {
             is GetPlatformsIntent -> viewModelScope.launchLoading { getPlatforms() }
+            is GetGameIntent -> viewModelScope.launchLoading { getGame() }
             is NewAppNameIntent -> viewModelScope.launch { saveAppName(intent.name) }
             is NewDevIdIntent -> viewModelScope.launch { saveDevId(intent.id) }
             is NewDevPasswordIntent -> viewModelScope.launch { saveDevPassword(intent.pwd) }
@@ -71,6 +73,7 @@ class MainViewModel(
     }
 
     private suspend fun getPlatforms() {
+        _screenState.value = screenState.value.copy(platformsState = "Processing...")
         try {
             val platforms = ScreenScraper.getSystems()
             _screenState.value = screenState.value.copy(platformsState = "${platforms.size} platforms found")
@@ -81,6 +84,28 @@ class MainViewModel(
         } catch (e: Exception) {
             Log.e("MainViewModel", "Unkown error", e)
             _screenState.value = screenState.value.copy(platformsState = "Unknown error")
+        }
+    }
+
+    private suspend fun getGame() {
+        _screenState.value = screenState.value.copy(gameState = "Processing...")
+        try {
+            val game = ScreenScraper.getGameInfo(
+                crcHexa = "50ABC90A",
+                systemId = 1,
+                romName = "Sonic The Hedgehog 2 (World).zip",
+                romSize = 749652,
+            )
+            _screenState.value = screenState.value.copy(gameState = "Game found")
+        } catch (e: NotRegisteredException) {
+            _screenState.value = screenState.value.copy(gameState = "Not registered")
+        } catch (e: BadDevIdsException) {
+            _screenState.value = screenState.value.copy(gameState = "Bad dev ids")
+        } catch (e: MissingUrlParameterException) {
+            _screenState.value = screenState.value.copy(gameState = "Missing params")
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Unkown error", e)
+            _screenState.value = screenState.value.copy(gameState = "Unknown error")
         }
     }
 
@@ -177,7 +202,8 @@ data class MainState(
     val softName: String? = null,
     val userId: String? = null,
     val userPassword: String? = null,
-    val platformsState: String = "Not launched"
+    val platformsState: String = "Not launched",
+    val gameState: String = "Not launched",
 )
 
 sealed interface ScreenIntent
@@ -187,3 +213,4 @@ data class NewAppNameIntent(val name: String): ScreenIntent
 data class NewUserIdIntent(val id: String): ScreenIntent
 data class NewUserPasswordIntent(val pwd: String): ScreenIntent
 data object GetPlatformsIntent: ScreenIntent
+data object GetGameIntent: ScreenIntent

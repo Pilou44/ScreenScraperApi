@@ -67,5 +67,11 @@ fun MainScreen(
             }
             Text(state.platformsState)
         }
+        Row {
+            Button(onClick = { scope.launch { channel.send(GetGameIntent) } }) {
+                Text("Get game")
+            }
+            Text(state.gameState)
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.wechantloup.screenscraperapi.lib
 
+import com.wechantloup.screenscraperapi.lib.model.GameInfo
 import com.wechantloup.screenscraperapi.lib.model.System
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
@@ -83,5 +84,16 @@ public object ScreenScraper: ScreenScraperApi {
     override suspend fun getSystems(): List<System> {
         val api = api ?: throw NotRegisteredException()
         return api.getSystems()
+    }
+
+    override suspend fun getGameInfo(
+        crcHexa: String,
+        systemId: Int,
+        romName: String,
+        romSize: Long,
+        romType: String,
+    ): GameInfo {
+        val api = api ?: throw NotRegisteredException()
+        return api.getGameInfo(crcHexa, systemId, romName, romSize, romType)
     }
 }
