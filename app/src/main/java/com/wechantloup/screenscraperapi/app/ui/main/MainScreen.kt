@@ -3,6 +3,7 @@ package com.wechantloup.screenscraperapi.app.ui.main
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -19,7 +20,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wechantloup.screenscraperapi.app.ui.register.NewUserPasswordIntent
 import com.wechantloup.screenscraperapi.lib.model.System
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -83,6 +83,18 @@ private fun MainScreen(
                 }
             }
         }
+
+        OutlinedTextField(
+            value = state.name,
+            onValueChange = { scope.launch { channel.send(SetNameIntent(it)) } },
+            label = { Text("Game name") },
+        )
+
+        Button(onClick = { scope.launch { channel.send(SearchIntent) } }) {
+            Text("Search")
+        }
+
+        Text(text = state.result)
     }
 }
 
