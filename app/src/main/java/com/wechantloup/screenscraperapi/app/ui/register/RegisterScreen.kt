@@ -1,12 +1,11 @@
-package com.wechantloup.screenscraperapi.app
+package com.wechantloup.screenscraperapi.app.ui.register
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,7 +19,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
-    viewModel: MainViewModel,
+    viewModel: RegisterViewModel,
     onRegistered: () -> Unit,
 ) {
     val state by viewModel.screenState.collectAsState()
@@ -30,7 +29,7 @@ fun RegisterScreen(
 
 @Composable
 fun RegisterScreen(
-    state: MainState,
+    state: RegisterState,
     channel: Channel<ScreenIntent>,
     onRegistered: () -> Unit,
 ) {
@@ -44,35 +43,35 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        TextField(
+        OutlinedTextField(
             value = state.devId.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewDevIdIntent(id)) }
             },
             label = { Text("Dev ID") },
         )
-        TextField(
+        OutlinedTextField(
             value = state.devPassword.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewDevPasswordIntent(id)) }
             },
             label = { Text("Dev password") },
         )
-        TextField(
+        OutlinedTextField(
             value = state.softName.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewAppNameIntent(id)) }
             },
             label = { Text("App name") },
         )
-        TextField(
+        OutlinedTextField(
             value = state.userId.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewUserIdIntent(id)) }
             },
             label = { Text("User ID") },
         )
-        TextField(
+        OutlinedTextField(
             value = state.userPassword.orEmpty(),
             onValueChange = { id: String ->
                 scope.launch { channel.send(NewUserPasswordIntent(id)) }
@@ -81,24 +80,6 @@ fun RegisterScreen(
         )
         Button(onClick = { scope.launch { channel.send(RegisterIntent) } }) {
             Text("Register")
-        }
-        Row {
-            Button(onClick = { scope.launch { channel.send(GetPlatformsIntent) } }) {
-                Text("Get platforms")
-            }
-            Text(state.platformsState)
-        }
-        Row {
-            Button(onClick = { scope.launch { channel.send(GetGameIntent) } }) {
-                Text("Get game")
-            }
-            Text(state.gameState)
-        }
-        Row {
-            Button(onClick = { scope.launch { channel.send(SearchGameIntent) } }) {
-                Text("Search game")
-            }
-            Text(state.searchGameState)
         }
     }
 }

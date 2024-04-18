@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 public data class System(
     @SerialName("id") val id: Int,
-    @SerialName("noms") val names: Names?,
+    @SerialName("noms") val names: Names,
     @SerialName("extensions") val extensions: String?,
 )
 

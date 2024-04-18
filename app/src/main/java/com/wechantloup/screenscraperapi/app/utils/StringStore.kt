@@ -1,4 +1,4 @@
-package com.wechantloup.screenscraperapi.app
+package com.wechantloup.screenscraperapi.app.utils
 
 import android.content.Context
 import androidx.datastore.core.DataStore

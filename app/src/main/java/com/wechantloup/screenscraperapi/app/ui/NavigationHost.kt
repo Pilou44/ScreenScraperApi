@@ -8,8 +8,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.wechantloup.screenscraperapi.app.MainViewModel
-import com.wechantloup.screenscraperapi.app.RegisterScreen
+import com.wechantloup.screenscraperapi.app.ui.main.MainScreen
+import com.wechantloup.screenscraperapi.app.ui.main.MainViewModel
+import com.wechantloup.screenscraperapi.app.ui.register.RegisterViewModel
+import com.wechantloup.screenscraperapi.app.ui.register.RegisterScreen
 
 // Screens
 private const val REGISTER_SCREEN = "register_screen"
@@ -41,7 +43,8 @@ fun NavigationHost(
             )
         }
         composable(MAIN_SCREEN) {
-            MainScreen()
+            val viewModel = getMainViewModel(activity = activity)
+            MainScreen(viewModel)
         }
 
 //        composable(EDIT_PLATFORM_SCREEN) {
@@ -86,5 +89,10 @@ fun NavigationHost(
 
 @Composable
 private fun getRegisterViewModel(
+    activity: ComponentActivity,
+) = viewModel<RegisterViewModel>(viewModelStoreOwner = activity)
+
+@Composable
+private fun getMainViewModel(
     activity: ComponentActivity,
 ) = viewModel<MainViewModel>(viewModelStoreOwner = activity)

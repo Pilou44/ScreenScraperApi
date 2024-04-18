@@ -1,10 +1,11 @@
-package com.wechantloup.screenscraperapi.app
+package com.wechantloup.screenscraperapi.app.ui.register
 
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.wechantloup.screenscraperapi.app.utils.StringStore
 import com.wechantloup.screenscraperapi.lib.BadDevIdsException
 import com.wechantloup.screenscraperapi.lib.MissingUrlParameterException
 import com.wechantloup.screenscraperapi.lib.NotRegisteredException
@@ -15,14 +16,15 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 
-class MainViewModel(
+class RegisterViewModel(
     application: Application,
 ): AndroidViewModel(application) {
 
-    private val _screenState: MutableStateFlow<MainState> = MutableStateFlow(MainState())
-    val screenState: StateFlow<MainState> = _screenState
+    private val _screenState: MutableStateFlow<RegisterState> = MutableStateFlow(RegisterState())
+    val screenState: StateFlow<RegisterState> = _screenState
 
     val screenIntentChannel = Channel<ScreenIntent>(Channel.UNLIMITED)
 
@@ -51,7 +53,7 @@ class MainViewModel(
     }
 
     fun resetState() {
-        _screenState.value = MainState()
+        _screenState.value = RegisterState()
     }
 
     private fun handleIntent(intent: ScreenIntent) {
@@ -197,9 +199,14 @@ class MainViewModel(
             ScreenScraper.getSystems()
             _screenState.value = screenState.value.copy(registered = true)
         } catch (e: BadDevIdsException) {
-            Toast.makeText(getApplication(), "Bad dev ids", Toast.LENGTH_LONG).show()
+            (Dispatchers.Main) {
+                Toast.makeText(getApplication(), "Bad dev ids", Toast.LENGTH_LONG).show()
+            }
         } catch (e: Exception) {
-            Toast.makeText(getApplication(), "Unknown error", Toast.LENGTH_LONG).show()
+            Log.e("Register", "Unknown error", e)
+            (Dispatchers.Main) {
+                Toast.makeText(getApplication(), "Unknown error", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -226,7 +233,7 @@ class MainViewModel(
     }
 }
 
-data class MainState(
+data class RegisterState(
     val isLoading: Boolean = false,
     val devId: String? = null,
     val devPassword: String? = null,
