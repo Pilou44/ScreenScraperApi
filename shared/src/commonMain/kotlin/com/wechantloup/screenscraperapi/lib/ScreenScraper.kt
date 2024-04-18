@@ -96,4 +96,9 @@ public object ScreenScraper: ScreenScraperApi {
         val api = api ?: throw NotRegisteredException()
         return api.getGameInfo(crcHexa, systemId, romName, romSize, romType)
     }
+
+    override suspend fun searchGame(name: String, systemId: Int?): List<GameInfo> {
+        val api = api ?: throw NotRegisteredException()
+        return api.searchGame(name, systemId)
+    }
 }

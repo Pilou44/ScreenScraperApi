@@ -4,12 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class GameInfoResponse(
+internal data class SearchGameResponse(
     @SerialName("response") val response: Response,
 ) {
 
     @Serializable
     internal data class Response(
-        @SerialName("jeu") val gameInfo: GameInfo,
+        @SerialName("jeux") val games: List<GameInfo>,
     )
 }

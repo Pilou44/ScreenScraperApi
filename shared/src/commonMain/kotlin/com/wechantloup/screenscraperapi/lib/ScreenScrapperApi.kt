@@ -3,6 +3,7 @@ package com.wechantloup.screenscraperapi.lib
 import com.wechantloup.screenscraperapi.lib.ScreenScraper.httpClient
 import com.wechantloup.screenscraperapi.lib.model.GameInfo
 import com.wechantloup.screenscraperapi.lib.model.GameInfoResponse
+import com.wechantloup.screenscraperapi.lib.model.SearchGameResponse
 import com.wechantloup.screenscraperapi.lib.model.System
 import com.wechantloup.screenscraperapi.lib.model.SystemListResponse
 import io.ktor.client.call.body
@@ -27,6 +28,10 @@ public interface ScreenScraperApi {
         romSize: Long,
         romType: String = "rom",
     ): GameInfo
+    public suspend fun searchGame(
+        name: String,
+        systemId: Int? = null,
+    ): List<GameInfo>
 }
 
 internal class ScreenScraperApiImpl(
@@ -64,6 +69,20 @@ internal class ScreenScraperApiImpl(
             }
         }
         return ssResponse.response.gameInfo
+    }
+
+    override suspend fun searchGame(
+        name: String,
+        systemId: Int?,
+    ): List<GameInfo> {
+        logger.debug { "Search game" }
+        val ssResponse: SearchGameResponse = launchRequest(SEARCH_GAME_INFO_PATH) {
+            url {
+                parameters.append("recherche", name)
+                systemId?.let { parameters.append("systemeid", systemId.toString()) }
+            }
+        }
+        return ssResponse.response.games
     }
 
     private suspend inline fun <reified T> launchRequest(url: String, crossinline buildUrl: HttpRequestBuilder.() -> Unit = {}): T {
@@ -111,6 +130,7 @@ internal class ScreenScraperApiImpl(
         private const val BASE_URL = "https://www.screenscraper.fr/api2/"
         private const val GET_SYSTEMS_PATH = "systemesListe.php"
         private const val GET_GAME_INFO_PATH = "jeuInfos.php"
+        private const val SEARCH_GAME_INFO_PATH = "jeuRecherche.php"
         private const val BAD_DEV_IDS_MSG = "Erreur de login : Verifier vos identifiants developpeur !"
         private const val MISSING_PARAMS_MSG = "Il manque des champs obligatoires dans l'url"
     }

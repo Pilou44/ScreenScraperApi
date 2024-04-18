@@ -73,5 +73,11 @@ fun MainScreen(
             }
             Text(state.gameState)
         }
+        Row {
+            Button(onClick = { scope.launch { channel.send(SearchGameIntent) } }) {
+                Text("Search game")
+            }
+            Text(state.searchGameState)
+        }
     }
 }

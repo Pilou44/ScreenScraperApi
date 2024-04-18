@@ -53,6 +53,7 @@ class MainViewModel(
         when (intent) {
             is GetPlatformsIntent -> viewModelScope.launchLoading { getPlatforms() }
             is GetGameIntent -> viewModelScope.launchLoading { getGame() }
+            is SearchGameIntent -> viewModelScope.launchLoading { searchGame() }
             is NewAppNameIntent -> viewModelScope.launch { saveAppName(intent.name) }
             is NewDevIdIntent -> viewModelScope.launch { saveDevId(intent.id) }
             is NewDevPasswordIntent -> viewModelScope.launch { saveDevPassword(intent.pwd) }
@@ -106,6 +107,23 @@ class MainViewModel(
         } catch (e: Exception) {
             Log.e("MainViewModel", "Unkown error", e)
             _screenState.value = screenState.value.copy(gameState = "Unknown error")
+        }
+    }
+
+    private suspend fun searchGame() {
+        _screenState.value = screenState.value.copy(searchGameState = "Processing...")
+        try {
+            val games = ScreenScraper.searchGame("Sonic")
+            _screenState.value = screenState.value.copy(searchGameState = "${games.size} games found")
+        } catch (e: NotRegisteredException) {
+            _screenState.value = screenState.value.copy(searchGameState = "Not registered")
+        } catch (e: BadDevIdsException) {
+            _screenState.value = screenState.value.copy(searchGameState = "Bad dev ids")
+        } catch (e: MissingUrlParameterException) {
+            _screenState.value = screenState.value.copy(searchGameState = "Missing params")
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Unkown error", e)
+            _screenState.value = screenState.value.copy(searchGameState = "Unknown error")
         }
     }
 
@@ -204,6 +222,7 @@ data class MainState(
     val userPassword: String? = null,
     val platformsState: String = "Not launched",
     val gameState: String = "Not launched",
+    val searchGameState: String = "Not launched",
 )
 
 sealed interface ScreenIntent
@@ -214,3 +233,4 @@ data class NewUserIdIntent(val id: String): ScreenIntent
 data class NewUserPasswordIntent(val pwd: String): ScreenIntent
 data object GetPlatformsIntent: ScreenIntent
 data object GetGameIntent: ScreenIntent
+data object SearchGameIntent: ScreenIntent

@@ -13,19 +13,3 @@ internal data class SystemListResponse(
         @SerialName("systemes") val systems: List<System>,
     )
 }
-
-@Serializable
-public data class System(
-    @SerialName("id") val id: Int,
-    @SerialName("noms") val names: Names?,
-    @SerialName("extensions") val extensions: String?,
-) {
-
-    @Serializable
-    public data class Names(
-        @SerialName("nom_eu") val euName: String?,
-        @SerialName("nom_us") val usName: String?,
-        @SerialName("nom_jp") val jpName: String?,
-        @SerialName("nom_retropie") val retropieName: String?,
-    )
-}
