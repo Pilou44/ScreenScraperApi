@@ -2,6 +2,7 @@ package com.wechantloup.screenscraperapi.app
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.wechantloup.screenscraperapi.lib.BadDevIdsException
@@ -49,11 +50,16 @@ class MainViewModel(
         }
     }
 
+    fun resetState() {
+        _screenState.value = MainState()
+    }
+
     private fun handleIntent(intent: ScreenIntent) {
         when (intent) {
             is GetPlatformsIntent -> viewModelScope.launchLoading { getPlatforms() }
             is GetGameIntent -> viewModelScope.launchLoading { getGame() }
             is SearchGameIntent -> viewModelScope.launchLoading { searchGame() }
+            is RegisterIntent -> viewModelScope.launchLoading { register() }
             is NewAppNameIntent -> viewModelScope.launch { saveAppName(intent.name) }
             is NewDevIdIntent -> viewModelScope.launch { saveDevId(intent.id) }
             is NewDevPasswordIntent -> viewModelScope.launch { saveDevPassword(intent.pwd) }
@@ -156,38 +162,45 @@ class MainViewModel(
     private suspend fun saveDevId(id: String) {
         _screenState.value = screenState.value.copy(devId = id)
         saveString(DEV_ID_ID, id)
-        register()
+//        register()
     }
 
     private suspend fun saveDevPassword(pwd: String) {
         _screenState.value = screenState.value.copy(devPassword = pwd)
         saveString(DEV_PASSWORD_ID, pwd)
-        register()
+//        register()
     }
 
     private suspend fun saveUserId(id: String) {
         _screenState.value = screenState.value.copy(userId = id)
         saveString(USER_ID_ID, id)
-        login()
+//        login()
     }
 
     private suspend fun saveUserPassword(pwd: String) {
         _screenState.value = screenState.value.copy(userPassword = pwd)
         saveString(USER_PASSWORD_ID, pwd)
-        login()
+//        login()
     }
 
     private suspend fun register() {
+        val userId = getUserId()
+        val userPassword = getUserPassword()
+        ScreenScraper.logIn(userId, userPassword)
+
         val appName = getAppName() ?: return
         val devId = getDevId() ?: return
         val devPassword = getDevPassword() ?: return
         ScreenScraper.register(devId, devPassword, appName)
-    }
 
-    private suspend fun login() {
-        val userId = getUserId()
-        val userPassword = getUserPassword()
-        ScreenScraper.logIn(userId, userPassword)
+        try {
+            ScreenScraper.getSystems()
+            _screenState.value = screenState.value.copy(registered = true)
+        } catch (e: BadDevIdsException) {
+            Toast.makeText(getApplication(), "Bad dev ids", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(getApplication(), "Unknown error", Toast.LENGTH_LONG).show()
+        }
     }
 
     private suspend fun getString(id: String): String? {
@@ -223,6 +236,7 @@ data class MainState(
     val platformsState: String = "Not launched",
     val gameState: String = "Not launched",
     val searchGameState: String = "Not launched",
+    val registered: Boolean = false,
 )
 
 sealed interface ScreenIntent
@@ -234,3 +248,4 @@ data class NewUserPasswordIntent(val pwd: String): ScreenIntent
 data object GetPlatformsIntent: ScreenIntent
 data object GetGameIntent: ScreenIntent
 data object SearchGameIntent: ScreenIntent
+data object RegisterIntent: ScreenIntent
