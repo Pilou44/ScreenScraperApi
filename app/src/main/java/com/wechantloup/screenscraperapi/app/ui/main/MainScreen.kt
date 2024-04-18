@@ -2,7 +2,10 @@ package com.wechantloup.screenscraperapi.app.ui.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,11 +93,25 @@ private fun MainScreen(
             label = { Text("Game name") },
         )
 
-        Button(onClick = { scope.launch { channel.send(SearchIntent) } }) {
-            Text("Search")
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = { scope.launch { channel.send(SearchIntent) } }) {
+                Text("Search")
+            }
+
+            Text(text = state.result)
         }
 
-        Text(text = state.result)
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f),
+        ) {
+            items(state.games.size) { index ->
+//                Game(state.games[index]) ToDo
+            }
+        }
     }
 }
 

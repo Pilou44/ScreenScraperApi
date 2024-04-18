@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.wechantloup.screenscraperapi.lib.ScreenScraper
+import com.wechantloup.screenscraperapi.lib.model.GameInfo
 import com.wechantloup.screenscraperapi.lib.model.System
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -97,6 +98,7 @@ data class MainState(
     val selectedSystemIndex: Int = -1,
     val name: String = "",
     val result: String = "",
+    val games: List<GameInfo> = emptyList(),
 )
 
 sealed interface ScreenIntent
