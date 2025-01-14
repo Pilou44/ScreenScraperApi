@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 public data class GameInfo(
-    @SerialName("id") val id: String?,
+    @SerialName("id") val id: String,
     @SerialName("noms") val names: List<RegionString>?,
     @SerialName("synopsis") val synopsis: List<LanguageString>?,
     @SerialName("note") val rating: TextString?,
@@ -17,6 +17,13 @@ public data class GameInfo(
     @SerialName("notgame") val unknownGame: Boolean?,
     @SerialName("medias") val medias: List<Media>,
     @SerialName("roms") val roms: List<Rom>?,
+    @SerialName("systeme") val system: GameSystem?,
+)
+
+@Serializable
+public data class GameSystem(
+    @SerialName("id") val id: Int,
+    @SerialName("nom") val name: String,
 )
 
 @Serializable

@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.wechantloup.screenscraperapi.lib.model.GameInfo
 import com.wechantloup.screenscraperapi.lib.model.System
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -112,6 +113,14 @@ private fun MainScreen(
 //                Game(state.games[index]) ToDo
             }
         }
+    }
+}
+
+@Composable
+private fun Game(gameInfo: GameInfo) {
+    Row {
+        Text(text = gameInfo.names?.first()?.text ?: gameInfo.id)
+        Text(text = gameInfo.system?.name.orEmpty())
     }
 }
 
